@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const FOOD_BUDGET = 100
 const NUM_DAYS = 4
@@ -9,7 +9,7 @@ const TRANSPORT_CATEGORIES = ['Uber', 'Lyft', 'Flight', 'Train', 'Taxi', 'Subway
 const TRANSPORT_COLORS = {
   Uber: 'bg-gray-900 text-white',
   Lyft: 'bg-pink-500 text-white',
-  Flight: 'bg-blue-600 text-white',
+  Flight: 'bg-pink-600 text-white',
   Train: 'bg-green-600 text-white',
   Taxi: 'bg-yellow-400 text-gray-900',
   Subway: 'bg-orange-500 text-white',
@@ -20,7 +20,7 @@ const TRANSPORT_COLORS = {
 const TRANSPORT_DOT_COLORS = {
   Uber: 'bg-gray-900',
   Lyft: 'bg-pink-500',
-  Flight: 'bg-blue-600',
+  Flight: 'bg-pink-600',
   Train: 'bg-green-600',
   Taxi: 'bg-yellow-400',
   Subway: 'bg-orange-500',
@@ -50,7 +50,7 @@ function EntryList({ entries, onDelete }) {
   return (
     <ul className="space-y-2">
       {entries.map((entry) => (
-        <li key={entry.id} className="relative group bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-100">
+        <li key={entry.id} className="relative group bg-white rounded-xl px-4 py-3 shadow-sm border border-pink-100">
           <button
             onClick={() => onDelete(entry.id)}
             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 focus:opacity-100 text-gray-400 hover:text-red-500 transition-opacity text-xs leading-none w-5 h-5 flex items-center justify-center rounded-full hover:bg-red-50"
@@ -67,12 +67,6 @@ function EntryList({ entries, onDelete }) {
               {entry.category}
             </span>
           </div>
-          {entry.comment && (
-            <>
-              <hr className="my-2 border-gray-100" />
-              <p className="text-xs text-gray-500 italic">{entry.comment}</p>
-            </>
-          )}
         </li>
       ))}
     </ul>
@@ -83,31 +77,29 @@ function AddEntryForm({ categories, onAdd, label }) {
   const [desc, setDesc] = useState('')
   const [cat, setCat] = useState(categories[0])
   const [amount, setAmount] = useState('')
-  const [comment, setComment] = useState('')
 
   function handleSubmit(e) {
     e.preventDefault()
     const num = Number(amount)
     if (!desc.trim() || !amount || num <= 0) return
-    onAdd({ id: crypto.randomUUID(), description: desc.trim(), category: cat, amount: num, comment: comment.trim() })
+    onAdd({ id: crypto.randomUUID(), description: desc.trim(), category: cat, amount: num })
     setDesc('')
     setAmount('')
-    setComment('')
     setCat(categories[0])
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 space-y-3">
+    <form onSubmit={handleSubmit} className="bg-white rounded-xl p-4 shadow-sm border border-pink-100 space-y-3">
       <div className="flex gap-2">
         <input
-          className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 min-w-0"
+          className="flex-1 border border-pink-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300 min-w-0"
           placeholder="Description"
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
           required
         />
         <input
-          className="w-24 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="w-24 border border-pink-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300"
           placeholder="Amount"
           type="number"
           min="0.01"
@@ -118,7 +110,7 @@ function AddEntryForm({ categories, onAdd, label }) {
         />
       </div>
       <select
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+        className="w-full border border-pink-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300 bg-white"
         value={cat}
         onChange={(e) => setCat(e.target.value)}
       >
@@ -126,15 +118,9 @@ function AddEntryForm({ categories, onAdd, label }) {
           <option key={c} value={c}>{c}</option>
         ))}
       </select>
-      <input
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-        placeholder="Comment (optional)"
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-      />
       <button
         type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+        className="w-full bg-pink-500 hover:bg-pink-600 active:bg-pink-700 text-white text-sm font-medium py-2 rounded-lg transition-colors"
       >
         {label}
       </button>
@@ -155,9 +141,9 @@ function FoodBar({ spent }) {
   const pct = Math.min((spent / FOOD_BUDGET) * 100, 100)
   const over = spent > FOOD_BUDGET
   return (
-    <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+    <div className="w-full bg-pink-100 rounded-full h-2.5 overflow-hidden">
       <div
-        className={`h-2.5 rounded-full transition-all duration-300 ${over ? 'bg-red-500' : 'bg-blue-500'}`}
+        className={`h-2.5 rounded-full transition-all duration-300 ${over ? 'bg-red-500' : 'bg-pink-500'}`}
         style={{ width: `${pct}%` }}
       />
     </div>
@@ -170,20 +156,20 @@ function DayView({ day, dayIndex, onAddFood, onDeleteFood, onAddTransport, onDel
   const transportTotal = day.transport.reduce((s, e) => s + e.amount, 0)
 
   const remainingLabel = foodRemaining < 0
-    ? `$${Math.abs(foodRemaining).toFixed(2)} over`
-    : `$${foodRemaining.toFixed(2)}`
+    ? `${Math.abs(foodRemaining).toFixed(2)} over`
+    : foodRemaining.toFixed(2)
 
   return (
     <div className="space-y-4">
       {/* Metric Cards */}
       <div className="grid grid-cols-3 gap-2">
-        <MetricCard label="Food Spent" value={foodSpent.toFixed(2)} colorClass="bg-blue-50 text-blue-800" />
+        <MetricCard label="Food Spent" value={foodSpent.toFixed(2)} colorClass="bg-pink-50 text-pink-800" />
         <MetricCard
           label="Food Left"
           value={remainingLabel}
           colorClass={foodRemaining < 0 ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-800'}
         />
-        <MetricCard label="Transport" value={transportTotal.toFixed(2)} colorClass="bg-purple-50 text-purple-800" />
+        <MetricCard label="Transport" value={transportTotal.toFixed(2)} colorClass="bg-pink-50 text-pink-800" />
       </div>
 
       {/* Food Progress Bar */}
@@ -197,7 +183,7 @@ function DayView({ day, dayIndex, onAddFood, onDeleteFood, onAddTransport, onDel
 
       {/* Food Section */}
       <section>
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">Food</h3>
+        <h3 className="text-xs font-semibold text-pink-400 uppercase tracking-widest mb-2">Food</h3>
         {day.food.length === 0 && (
           <p className="text-sm text-gray-400 italic mb-2">No food entries yet.</p>
         )}
@@ -209,7 +195,7 @@ function DayView({ day, dayIndex, onAddFood, onDeleteFood, onAddTransport, onDel
 
       {/* Transport Section */}
       <section>
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">Transport</h3>
+        <h3 className="text-xs font-semibold text-pink-400 uppercase tracking-widest mb-2">Transport</h3>
         {day.transport.length === 0 && (
           <p className="text-sm text-gray-400 italic mb-2">No transport entries yet.</p>
         )}
@@ -248,8 +234,8 @@ function SummaryView({ days }) {
   return (
     <div className="space-y-4">
       {/* Food Summary */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Food Summary</h3>
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-pink-100">
+        <h3 className="text-xs font-semibold text-pink-400 uppercase tracking-widest mb-3">Food Summary</h3>
         <div className="flex justify-between text-sm mb-1.5">
           <span className="text-gray-600">Total spent</span>
           <span className="font-semibold text-gray-900">${totalFood.toFixed(2)}</span>
@@ -258,15 +244,15 @@ function SummaryView({ days }) {
           <span className="text-gray-600">Total budget ({NUM_DAYS} × $100)</span>
           <span className="font-semibold text-gray-900">${totalBudget.toFixed(2)}</span>
         </div>
-        <div className={`flex justify-between text-sm font-semibold border-t border-gray-100 pt-2 mt-2 ${totalBudgetRemaining < 0 ? 'text-red-600' : 'text-green-700'}`}>
+        <div className={`flex justify-between text-sm font-semibold border-t border-pink-100 pt-2 mt-2 ${totalBudgetRemaining < 0 ? 'text-red-600' : 'text-green-700'}`}>
           <span>Budget remaining</span>
           <span>${totalBudgetRemaining.toFixed(2)}</span>
         </div>
       </div>
 
       {/* Transport Breakdown */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Transport Breakdown</h3>
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-pink-100">
+        <h3 className="text-xs font-semibold text-pink-400 uppercase tracking-widest mb-3">Transport Breakdown</h3>
         {Object.keys(transportByCategory).length === 0 ? (
           <p className="text-sm text-gray-400 italic">No transport entries yet.</p>
         ) : (
@@ -280,7 +266,7 @@ function SummaryView({ days }) {
                 <span className="font-semibold text-gray-900">${total.toFixed(2)}</span>
               </li>
             ))}
-            <li className="flex justify-between text-sm font-semibold border-t border-gray-100 pt-2 mt-1 text-gray-800">
+            <li className="flex justify-between text-sm font-semibold border-t border-pink-100 pt-2 mt-1 text-gray-800">
               <span>Total</span>
               <span>${totalTransport.toFixed(2)}</span>
             </li>
@@ -289,11 +275,11 @@ function SummaryView({ days }) {
       </div>
 
       {/* Per-Day Table */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Per-Day Breakdown</h3>
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-pink-100">
+        <h3 className="text-xs font-semibold text-pink-400 uppercase tracking-widest mb-3">Per-Day Breakdown</h3>
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-gray-400 border-b border-gray-100 text-xs">
+            <tr className="text-gray-400 border-b border-pink-100 text-xs">
               <th className="text-left pb-2 font-medium">Day</th>
               <th className="text-right pb-2 font-medium">Food</th>
               <th className="text-right pb-2 font-medium">Remaining</th>
@@ -304,7 +290,7 @@ function SummaryView({ days }) {
             {perDay.map((d, i) => {
               const remaining = FOOD_BUDGET - d.foodSpent
               return (
-                <tr key={i} className="border-b border-gray-50 last:border-0">
+                <tr key={i} className="border-b border-pink-50 last:border-0">
                   <td className="py-2 text-gray-700 font-medium">Day {i + 1}</td>
                   <td className="py-2 text-right text-gray-900">${d.foodSpent.toFixed(2)}</td>
                   <td className={`py-2 text-right font-medium ${remaining < 0 ? 'text-red-500' : 'text-green-600'}`}>
@@ -319,12 +305,12 @@ function SummaryView({ days }) {
       </div>
 
       {/* Grand Total */}
-      <div className="bg-gray-900 text-white rounded-xl p-4 shadow-sm">
-        <div className="flex justify-between text-sm mb-1.5 text-gray-300">
+      <div className="bg-pink-600 text-white rounded-xl p-4 shadow-sm">
+        <div className="flex justify-between text-sm mb-1.5 text-pink-100">
           <span>Total food</span>
           <span>${totalFood.toFixed(2)}</span>
         </div>
-        <div className="flex justify-between text-sm mb-3 text-gray-300">
+        <div className="flex justify-between text-sm mb-3 text-pink-100">
           <span>Total transport</span>
           <span>${totalTransport.toFixed(2)}</span>
         </div>
@@ -338,8 +324,18 @@ function SummaryView({ days }) {
 }
 
 export default function App() {
-  const [state, setState] = useState(initState)
-  const [activeTab, setActiveTab] = useState(0) // 0-3 = days, 4 = summary
+  const [state, setState] = useState(() => {
+    try {
+      const saved = localStorage.getItem('budget-tracker')
+      if (saved) return JSON.parse(saved)
+    } catch {}
+    return initState()
+  })
+  const [activeTab, setActiveTab] = useState(0)
+
+  useEffect(() => {
+    localStorage.setItem('budget-tracker', JSON.stringify(state))
+  }, [state])
 
   function addFood(dayIndex, entry) {
     setState((prev) => ({
@@ -368,24 +364,24 @@ export default function App() {
   const tabs = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Summary']
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-6 px-3">
+    <div className="min-h-screen bg-pink-50 flex flex-col items-center py-6 px-3">
       <div className="w-full max-w-[420px] flex flex-col gap-4">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Business Trip Tracker</h1>
-          <p className="text-sm text-gray-500 mt-0.5">4-day trip · $100/day food budget</p>
+          <h1 className="text-2xl font-bold text-pink-700 tracking-tight">Business Trip Tracker</h1>
+          <p className="text-sm text-pink-400 mt-0.5">4-day trip · $100/day food budget</p>
         </div>
 
         {/* Tab Bar */}
-        <div className="flex bg-white rounded-xl shadow-sm border border-gray-100 p-1 gap-0.5">
+        <div className="flex bg-white rounded-xl shadow-sm border border-pink-100 p-1 gap-0.5">
           {tabs.map((tab, i) => (
             <button
               key={tab}
               onClick={() => setActiveTab(i)}
               className={`flex-1 text-xs font-medium py-2 rounded-lg transition-colors ${
                 activeTab === i
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+                  ? 'bg-pink-500 text-white shadow-sm'
+                  : 'text-gray-500 hover:text-pink-600 hover:bg-pink-50'
               }`}
             >
               {tab}
