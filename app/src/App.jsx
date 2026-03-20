@@ -205,7 +205,7 @@ function AddEntryForm({ subCategories, color, label, onAdd }) {
 
 // ─── Budget bar ────────────────────────────────────────────────────────────────
 function BudgetBar({ spent, budget, color }) {
-  const pct = Math.min((spent / budget) * 100, 100)
+  const pct = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0
   const over = spent > budget
   return (
     <div className="space-y-1">
@@ -425,7 +425,7 @@ function CategoryCard({ cat, onUpdate, onDelete }) {
 
           {/* Delete category */}
           <button
-            onClick={onDelete}
+            onClick={() => { if (window.confirm(`Delete "${cat.name}" and all its entries?`)) onDelete() }}
             className="w-full text-red-500 border border-red-200 text-sm font-medium py-2.5 rounded-lg hover:bg-red-50 active:bg-red-100 transition-colors"
           >
             Delete Category
@@ -533,7 +533,9 @@ export default function App() {
   const summaryTab = numDays
   const settingsTab = numDays + 1
   useEffect(() => {
-    if (activeTab > settingsTab) setActiveTab(Math.min(activeTab, summaryTab))
+    if (activeTab >= numDays && activeTab !== summaryTab && activeTab !== settingsTab) {
+      setActiveTab(Math.max(0, numDays - 1))
+    }
   }, [numDays])
 
   // ── Entry mutations
